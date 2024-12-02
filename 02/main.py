@@ -19,7 +19,8 @@ def parse(f):
     """Parse a list of reports and find the number that are safe."""
     total = 0
     for line in f:
-        if is_safe([int(s, 10) for s in str.split(line)]):
+        report = [int(s, 10) for s in str.split(line)]
+        if is_safe(report) or is_safe_ish(report):
             total += 1
     return total
 
@@ -27,6 +28,14 @@ def parse(f):
 def adj_pairs(arr: list[any]) -> zip:
     """Create a zip iterator of the adjacent pairs of a list."""
     return zip(arr[:-1], arr[1:])
+
+
+def is_safe_ish(report: list[int]) -> bool:
+    """Check if a report is safe after removing one element."""
+    for i in range(len(report)):
+        if is_safe(report[:i] + report[i + 1 :]):
+            return True
+    return False
 
 
 def is_safe(report: list[int]) -> bool:
