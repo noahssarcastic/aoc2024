@@ -12,7 +12,10 @@
             "console": "integratedTerminal",
             "args": [
                 "${fileDirname}/input.txt"
-            ]
+            ],
+            "env": {
+                "PYTHONPATH": "${fileDirname}"
+            }
         }
     ]
 }
