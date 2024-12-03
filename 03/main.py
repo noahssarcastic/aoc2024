@@ -12,20 +12,27 @@ def main():
     args = parser.parse_args()
 
     total = 0
+    do = True
     with open(args.filename, mode="r", encoding="utf-8") as f:
         for line in f:
             tokens = tokenize_line(line)
-            total += exec_line(tokens)
+            print(tokens)
+            line_sum, do = exec_line(tokens, do)
+            total += line_sum
     print(total)
 
 
-def exec_line(tokens: list[any]) -> int:
+def exec_line(tokens: list[any], do: bool) -> int:
     """Execute a line of the program."""
     total = 0
     for i, t in enumerate(tokens):
-        if t == "MUL(":
+        if do and t == "MUL(":
             total += exec_mul(tokens[i:]) or 0
-    return total
+        elif t == "DO()":
+            do = True
+        elif t == "DONT()":
+            do = False
+    return total, do
 
 
 def exec_mul(arr: list[any]) -> int | None:

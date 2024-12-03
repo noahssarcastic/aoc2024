@@ -29,6 +29,10 @@ def tokenize_line(line: str):
             val, x = parse_directive_end(s)
         if is_comma(s):
             val, x = parse_comma(s)
+        if is_do(s):
+            val, x = parse_do(s)
+        if is_dont(s):
+            val, x = parse_dont(s)
         tokens.append(val)
         consume(cursor, x)
     return tokens
@@ -98,3 +102,29 @@ def parse_comma(_s: str) -> tuple[str, int]:
 
     Also return the number of extra characters consumed."""
     return ",", 0
+
+
+def is_do(s: str) -> bool:
+    """Check if next token is a do directive."""
+    return s[:4] == "do()"
+
+
+def parse_do(_s: str) -> tuple[str, int]:
+    """
+    Generate a do token from a string.
+
+    Also return the number of extra characters consumed."""
+    return "DO()", 3
+
+
+def is_dont(s: str) -> bool:
+    """Check if next token is a dont directive."""
+    return s[:7] == "don't()"
+
+
+def parse_dont(_s: str) -> tuple[str, int]:
+    """
+    Generate a dont token from a string.
+
+    Also return the number of extra characters consumed."""
+    return "DONT()", 6
