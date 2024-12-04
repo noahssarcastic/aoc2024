@@ -4,7 +4,7 @@ import argparse
 
 
 def main():
-    """Parse word search and look for XMAS."""
+    """Parse word search and look for X-MAS."""
     parser = argparse.ArgumentParser()
     parser.add_argument("filename")
     args = parser.parse_args()
@@ -14,30 +14,28 @@ def main():
         for line in f:
             rows.append(line)
 
-    word = "XMAS"
-    directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
-
     total = 0
     for j, r in enumerate(rows):
         for i, c in enumerate(r):
-            if c == "X":
-                total += check_word(rows, word, directions, (i, j))
+            if c == "A":
+                total += check(rows, (i, j))
 
     print(total)
 
 
-def check_word(
+def check(
     puzzle: list[str],
-    word: str,
-    directions: list[tuple[int, int]],
     start: tuple[int, int],
 ) -> int:
-    """Look for `word` along all legal `directions`."""
+    """Search for two MAS's along diagonals."""
+    word = "MAS"
+    directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+
     total = 0
     for d in directions:
-        if check_direction(puzzle, word, d, start):
+        if check_direction(puzzle, word, d, (start[0] - d[0], start[1] - d[1])):
             total += 1
-    return total
+    return 1 if total == 2 else 0
 
 
 def check_direction(
@@ -47,9 +45,11 @@ def check_direction(
     start: tuple[int, int],
 ):
     """Look for `word` along `direction`."""
-    for i, c in enumerate(word[1:]):
-        row = start[1] + direction[1] * (i + 1)
-        col = start[0] + direction[0] * (i + 1)
+    if start[0] < 0 or start[1] < 0:
+        return False
+    for i, c in enumerate(word):
+        row = start[1] + direction[1] * (i)
+        col = start[0] + direction[0] * (i)
         if row < 0 or col < 0:
             return False
         try:
