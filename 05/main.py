@@ -1,6 +1,7 @@
 """Day 5: Print Queue."""
 
 import argparse
+from collections import defaultdict
 import math
 import time
 
@@ -11,15 +12,16 @@ def main():
     parser.add_argument("filename")
     args = parser.parse_args()
 
-    page_order = []
+    page_order = defaultdict(list)
     updates = []
     with open(args.filename, mode="r", encoding="utf-8") as f:
         for line in f:
             if line.isspace():
                 break
-            page_order.append([int(x, 10) for x in line.strip().split("|")])
+            first, second = line.strip().split("|")
+            page_order[first].append(second)
         for line in f:
-            updates.append([int(x, 10) for x in line.strip().split(",")])
+            updates.append(line.strip().split(","))
 
     total = 0
     for u in updates:
@@ -27,11 +29,11 @@ def main():
         if fixes == 0:
             continue
         middle_idx = math.floor(len(u) / 2)
-        total += reordered[middle_idx]
+        total += int(reordered[middle_idx], 10)
     print(total)
 
 
-def reorder(arr: list[int], lookup) -> list[int]:
+def reorder(arr, lookup) -> tuple[list, int]:
     """Fix ordering of `arr` and track the number of fixes."""
     fixes = 0
     while True:
@@ -43,7 +45,7 @@ def reorder(arr: list[int], lookup) -> list[int]:
     return arr, fixes
 
 
-def fix_unsorted(arr: list[int], lookup) -> list[int] | None:
+def fix_unsorted(arr, lookup) -> list | None:
     """Look for an ordering mistake and correct it."""
     for i, a in enumerate(arr):
         # Look for an ordering mistake starting from the back
@@ -57,12 +59,9 @@ def fix_unsorted(arr: list[int], lookup) -> list[int] | None:
     return None
 
 
-def is_before(a: int, b: int, lookup) -> bool:
+def is_before(a, b, lookup) -> bool:
     """Check if page `a` is before page `b`."""
-    for rule in lookup:
-        if rule[0] == b and rule[1] == a:
-            return False
-    return True
+    return b in lookup.get(a, [])
 
 
 if __name__ == "__main__":
