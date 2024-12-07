@@ -2,6 +2,7 @@
 
 import argparse
 import math
+import time
 
 
 def main():
@@ -22,25 +23,42 @@ def main():
 
     total = 0
     for u in updates:
-        if in_order(u, page_order):
-            total += u[math.floor(len(u) / 2)]
+        reordered, fixes = reorder(u, page_order)
+        if fixes == 0:
+            continue
+        middle_idx = math.floor(len(u) / 2)
+        total += reordered[middle_idx]
     print(total)
 
 
-def in_order(arr, lookup) -> bool:
-    """Check if page numbers are in order."""
+def reorder(arr: list[int], lookup) -> list[int]:
+    """Fix ordering of `arr` and track the number of fixes."""
+    fixes = 0
+    while True:
+        temp = fix_unsorted(arr, lookup)
+        if temp is None:
+            break
+        arr = temp
+        fixes += 1
+    return arr, fixes
+
+
+def fix_unsorted(arr: list[int], lookup) -> list[int] | None:
+    """Look for an ordering mistake and correct it."""
     for i, a in enumerate(arr):
-        for _j, b in enumerate(arr[i + 1 :]):
-            if not is_before(a, b, lookup):
-                return False
-                # print(f"moving {a}@{i} to after {b}@{j}")
-                # arr.insert(j, arr.pop(i))
-    return True
+        # Look for an ordering mistake starting from the back
+        for j in range(len(arr) - 1, i, -1):
+            b = arr[j]
+            if is_before(a, b, lookup):
+                continue
+            # Move a to after b at index j
+            arr.insert(j, arr.pop(i))
+            return arr
+    return None
 
 
 def is_before(a: int, b: int, lookup) -> bool:
     """Check if page `a` is before page `b`."""
-    # print(f"checking if {a} is before {b}")
     for rule in lookup:
         if rule[0] == b and rule[1] == a:
             return False
@@ -48,4 +66,7 @@ def is_before(a: int, b: int, lookup) -> bool:
 
 
 if __name__ == "__main__":
+    start = time.time()
     main()
+    end = time.time()
+    print("Execution time is :", (end - start) * 10**3, "ms")
